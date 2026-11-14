@@ -51,6 +51,38 @@ var Game = (function () {
     return { board: next, points: points, moved: moved };
   }
 
+  // The same slide, tile by tile, for drawing it. Returns what slide()
+  // returns plus moves: one { from, to, into } per tile, where from and to
+  // are its cells before and after the slide, and into is the starting cell
+  // of the tile it merges into, or -1. Of two tiles that merge, the one
+  // nearer the wall stays and the other slides into it.
+  function slideTiles(board, action) {
+    var next = new Array(16).fill(0);
+    var moves = [];
+    var points = 0;
+    LINES[action].forEach(function (cells) {
+      var slot = -1; // index in the line where the last tile landed
+      var open = -1; // that tile's starting cell, while it can still merge
+      cells.forEach(function (from) {
+        var e = board[from];
+        if (e === 0) return;
+        if (open >= 0 && board[open] === e) {
+          next[cells[slot]] = e + 1;
+          points += Math.pow(2, e + 1);
+          moves.push({ from: from, to: cells[slot], into: open });
+          open = -1;
+        } else {
+          slot += 1;
+          next[cells[slot]] = e;
+          moves.push({ from: from, to: cells[slot], into: -1 });
+          open = from;
+        }
+      });
+    });
+    var moved = next.some(function (e, i) { return e !== board[i]; });
+    return { board: next, points: points, moved: moved, moves: moves };
+  }
+
   // Every move that changes the board: { action, after, points }.
   function legalMoves(board) {
     var moves = [];
@@ -89,6 +121,7 @@ var Game = (function () {
   return {
     CHANCE_OF_FOUR: CHANCE_OF_FOUR,
     slide: slide,
+    slideTiles: slideTiles,
     legalMoves: legalMoves,
     emptyCells: emptyCells,
     spawn: spawn,

@@ -6,8 +6,9 @@
   --accent: #E07A3F;
   --yellow: #FCE59A;
   --line: #EAD7BC;
-  /* The board shrinks to fit narrow or short windows. */
-  --board: max(220px, min(300px, calc(100vw - 32px), calc(100vh - 380px)));
+  /* The board shrinks to fit narrow or short windows. 396px is the height
+     of everything else on the page in Watch the AI, plus a little spare. */
+  --board: max(220px, min(300px, calc(100vw - 32px), calc(100vh - 396px)));
 }
 
 * { box-sizing: border-box; }
@@ -83,6 +84,7 @@ button:focus-visible, input:focus-visible {
 }
 
 .stat {
+  position: relative;
   min-width: 86px;
   padding: 4px 10px;
   background: var(--panel);
@@ -111,36 +113,44 @@ button:focus-visible, input:focus-visible {
 }
 
 .board {
+  position: relative;
   width: 100%;
   height: 100%;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 6px;
-  padding: 6px;
   background: var(--brown);
   border-radius: 12px;
+  /* Keeps the tiles' z-index inside the board, under the game-over box. */
+  isolation: isolate;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
 
-.cell {
+/* js/anim.js sets --cell and places the empty slots and the tiles. */
+.slot, .tile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 8px;
+}
+
+.slot { background: #E9D3B1; }
+
+.tile {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  background: #E9D3B1;
   font-weight: bold;
   font-size: calc(var(--board) * 0.1);
+  will-change: transform;
+  z-index: 3;
 }
 
-.cell.new { animation: appear 0.15s ease-out; }
-
-@keyframes appear {
-  from { transform: scale(0.4); }
-  to { transform: scale(1); }
-}
+/* A new tile grows in under tiles sliding past. A tile merging into
+   another slides in under it, and its number fades so the two read as one. */
+.tile.new { z-index: 2; }
+.tile.merging { z-index: 1; color: transparent; transition: color 0.1s; }
 
 /* Light cream for small tiles, deepening to orange and red as they grow. */
 .t1 { background: #FFF6DF; }
@@ -160,6 +170,7 @@ button:focus-visible, input:focus-visible {
 .over {
   position: absolute;
   inset: 0;
+  animation: fade-in 0.4s ease-out 0.2s both;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -171,6 +182,10 @@ button:focus-visible, input:focus-visible {
 }
 
 .over[hidden] { display: none; }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
 
 .over p { margin: 0; }
 .over-title { font-size: 28px; font-weight: bold; color: var(--brown); }
@@ -266,4 +281,27 @@ button:focus-visible, input:focus-visible {
   line-height: 1.4;
   text-align: center;
   color: var(--brown);
+}
+
+/* Points scored, rising beside the score box. */
+.score-float {
+  position: absolute;
+  right: 100%;
+  top: 18px;
+  margin-right: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--accent);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: float-up 0.9s ease-out forwards;
+}
+
+@keyframes float-up {
+  40% { opacity: 1; animation-timing-function: linear; }
+  to { transform: translateY(-20px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .over { animation: none; }
 }

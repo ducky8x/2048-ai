@@ -10,7 +10,6 @@
     board: null,
     score: 0,
     moves: 0,
-    newCell: -1,
     mode: "human",
     net: null,
     running: false,
@@ -22,12 +21,7 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var boardEl = $("board");
-  var cells = [];
-  for (var i = 0; i < 16; i++) {
-    var cell = document.createElement("div");
-    boardEl.appendChild(cell);
-    cells.push(cell);
-  }
+  Anim.init(boardEl);
 
   function newGame() {
     var first = Game.spawn(new Array(16).fill(0), Math.random);
@@ -35,20 +29,23 @@
     state.board = second.board;
     state.score = 0;
     state.moves = 0;
-    state.newCell = -1;
+    Anim.reset(state.board);
     refreshScores();
     render();
   }
 
-  // Play one move. Returns false if the move changes nothing.
+  // Play one move. Returns false if the move changes nothing. The game
+  // moves on at once; the tiles catch up on screen.
   function play(action) {
-    var result = Game.slide(state.board, action);
+    var result = Game.slideTiles(state.board, action);
     if (!result.moved) return false;
     var spawned = Game.spawn(result.board, Math.random);
     state.board = spawned.board;
-    state.newCell = spawned.cell;
     state.score += result.points;
     state.moves += 1;
+    Anim.move(result);
+    Anim.spawn(spawned.cell, state.board[spawned.cell]);
+    Anim.floatPoints($("score").parentNode, result.points);
     refreshScores();
     render();
     return true;
@@ -61,11 +58,6 @@
   }
 
   function render() {
-    for (var i = 0; i < 16; i++) {
-      var e = state.board[i];
-      cells[i].className = "cell" + (e ? " t" + Math.min(e, 13) : "") + (i === state.newCell ? " new" : "");
-      cells[i].textContent = e ? String(Math.pow(2, e)) : "";
-    }
     $("score").textContent = state.score.toLocaleString("en-US");
     $("best").textContent = Game.maxTile(state.board).toLocaleString("en-US");
     $("moves").textContent = state.moves.toLocaleString("en-US");
@@ -130,8 +122,14 @@
     $("mode-ai").setAttribute("aria-pressed", String(mode === "ai"));
     $("human-panel").hidden = mode !== "human";
     $("ai-panel").hidden = mode !== "ai";
+    setPace();
     refreshScores();
     render();
+  }
+
+  // Tiles keep up with the AI's speed setting; a person's moves get one pace.
+  function setPace() {
+    Anim.setPace(state.mode === "ai" ? state.delay : 0);
   }
 
   $("mode-human").addEventListener("click", function () { setMode("human"); });
@@ -152,6 +150,7 @@
   document.querySelectorAll(".speed").forEach(function (button) {
     button.addEventListener("click", function () {
       state.delay = Number(button.dataset.delay);
+      setPace();
       document.querySelectorAll(".speed").forEach(function (b) {
         b.classList.toggle("active", b === button);
         b.setAttribute("aria-pressed", String(b === button));
