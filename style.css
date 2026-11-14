@@ -6,8 +6,9 @@
   --accent: #E07A3F;
   --yellow: #FCE59A;
   --line: #EAD7BC;
-  /* The board shrinks to fit narrow or short windows. */
-  --board: max(220px, min(300px, calc(100vw - 32px), calc(100vh - 380px)));
+  /* The board shrinks to fit narrow or short windows. 396px is the height
+     of everything else on the page in Watch the AI, plus a little spare. */
+  --board: max(220px, min(300px, calc(100vw - 32px), calc(100vh - 396px)));
 }
 
 * { box-sizing: border-box; }
