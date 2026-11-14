@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learning 2048</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app" tabindex="-1">
+    <header>
+      <h1>Learning 2048</h1>
+      <p class="subtitle">A neural network that taught itself 2048 by playing it.</p>
+    </header>
+
+    <div class="modes" role="group" aria-label="Mode">
+      <button type="button" id="mode-human" class="mode active" aria-pressed="true">You play</button>
+      <button type="button" id="mode-ai" class="mode" aria-pressed="false">Watch the AI</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span class="label">Score</span><span id="score" class="number">0</span></div>
+      <div class="stat"><span class="label">Best tile</span><span id="best" class="number">0</span></div>
+      <div class="stat"><span class="label">Moves</span><span id="moves" class="number">0</span></div>
+    </div>
+
+    <div class="board-wrap">
+      <div id="board" class="board" aria-label="Game board"></div>
+      <div id="over" class="over" hidden>
+        <p class="over-title">Game over</p>
+        <p id="over-score"></p>
+        <button type="button" id="over-new" class="button primary">New game</button>
+      </div>
+    </div>
+
+    <section id="human-panel" class="panel">
+      <div class="row">
+        <button type="button" class="button new-game">New game</button>
+      </div>
+      <p class="hint">Move with the arrow keys or WASD, or swipe on the board.</p>
+    </section>
+
+    <section id="ai-panel" class="panel" hidden>
+      <div class="row">
+        <button type="button" id="start" class="button primary">Start</button>
+        <button type="button" id="step" class="button">Step</button>
+        <button type="button" class="button new-game">New game</button>
+      </div>
+      <div class="row">
+        <div class="speeds" role="group" aria-label="Speed">
+          <button type="button" class="speed" data-delay="400" aria-pressed="false">Slow</button>
+          <button type="button" class="speed active" data-delay="120" aria-pressed="true">Normal</button>
+          <button type="button" class="speed" data-delay="20" aria-pressed="false">Fast</button>
+        </div>
+        <label class="toggle"><input type="checkbox" id="ahead"> Think ahead</label>
+      </div>
+      <div class="thinking" aria-live="off">
+        <div class="move-score" data-action="0"><span class="dir">Up</span><span class="val">-</span></div>
+        <div class="move-score" data-action="3"><span class="dir">Left</span><span class="val">-</span></div>
+        <div class="move-score" data-action="1"><span class="dir">Right</span><span class="val">-</span></div>
+        <div class="move-score" data-action="2"><span class="dir">Down</span><span class="val">-</span></div>
+      </div>
+      <p id="model-status" class="hint">Loading the model...</p>
+    </section>
+
+    <p class="note">The model trained for 25,451 games. Playing greedily it averages about 23,000 points and reaches 2048 in about half its games; thinking ahead it reaches 2048 almost every game.</p>
+  </main>
+
+  <script src="js/game.js"></script>
+  <script src="js/network.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
