@@ -12,7 +12,7 @@ var Anim = (function () {
   var SCALE_SPEED = 1.2; // scale springs run this much faster than slides
   var LAND = 0.05;       // a merging tile lands this close to its host, in cells
   var GIVE_UP = 1;       // seconds a merging tile may chase before it is dropped
-  var MAX_DT = 0.05;     // longest step in seconds, e.g. after a hidden tab
+  var MAX_DT = 1 / 30;   // longest step in seconds, e.g. after a hidden tab
 
   var boardEl;
   var slots = [];
