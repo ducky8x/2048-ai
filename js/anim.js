@@ -276,7 +276,7 @@ var Anim = (function () {
   function floatPoints(el, points) {
     if (reduce.matches || !points) return;
     var now = performance.now();
-    if (lastFloat && now - lastFloat.at < 150) {
+    if (lastFloat && now - lastFloat.at < 300) {
       lastFloat.points += points;
     } else {
       var f = document.createElement("span");
