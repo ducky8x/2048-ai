@@ -26,6 +26,7 @@ var Anim = (function () {
   var clock = 0;        // seconds of animation; stops while the tab is hidden
   var last = 0;
   var frameId = 0;
+  var lastFloat = null;
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   function init(el) {
@@ -270,11 +271,29 @@ var Anim = (function () {
     }
   }
 
+  // "+points" rising beside el, the score box. Points that come in quick
+  // succession, as when the AI plays fast, add up in one float.
+  function floatPoints(el, points) {
+    if (reduce.matches || !points) return;
+    var now = performance.now();
+    if (lastFloat && now - lastFloat.at < 150) {
+      lastFloat.points += points;
+    } else {
+      var f = document.createElement("span");
+      f.className = "score-float";
+      f.addEventListener("animationend", function () { f.remove(); });
+      el.appendChild(f);
+      lastFloat = { el: f, at: now, points: points };
+    }
+    lastFloat.el.textContent = "+" + lastFloat.points.toLocaleString("en-US");
+  }
+
   return {
     init: init,
     setPace: setPace,
     reset: reset,
     move: move,
-    spawn: spawn
+    spawn: spawn,
+    floatPoints: floatPoints
   };
 })();

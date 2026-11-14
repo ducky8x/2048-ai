@@ -45,6 +45,7 @@
     state.moves += 1;
     Anim.move(result);
     Anim.spawn(spawned.cell, state.board[spawned.cell]);
+    Anim.floatPoints($("score").parentNode, result.points);
     refreshScores();
     render();
     return true;

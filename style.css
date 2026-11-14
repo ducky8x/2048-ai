@@ -83,6 +83,7 @@ button:focus-visible, input:focus-visible {
 }
 
 .stat {
+  position: relative;
   min-width: 86px;
   padding: 4px 10px;
   background: var(--panel);
@@ -168,6 +169,7 @@ button:focus-visible, input:focus-visible {
 .over {
   position: absolute;
   inset: 0;
+  animation: fade-in 0.4s ease-out 0.2s both;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -179,6 +181,10 @@ button:focus-visible, input:focus-visible {
 }
 
 .over[hidden] { display: none; }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
 
 .over p { margin: 0; }
 .over-title { font-size: 28px; font-weight: bold; color: var(--brown); }
@@ -274,4 +280,27 @@ button:focus-visible, input:focus-visible {
   line-height: 1.4;
   text-align: center;
   color: var(--brown);
+}
+
+/* Points scored, rising beside the score box. */
+.score-float {
+  position: absolute;
+  right: 100%;
+  top: 18px;
+  margin-right: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--accent);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: float-up 0.9s ease-out forwards;
+}
+
+@keyframes float-up {
+  40% { opacity: 1; animation-timing-function: linear; }
+  to { transform: translateY(-20px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .over { animation: none; }
 }
