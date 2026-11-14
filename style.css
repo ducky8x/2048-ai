@@ -111,36 +111,44 @@ button:focus-visible, input:focus-visible {
 }
 
 .board {
+  position: relative;
   width: 100%;
   height: 100%;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 6px;
-  padding: 6px;
   background: var(--brown);
   border-radius: 12px;
+  /* Keeps the tiles' z-index inside the board, under the game-over box. */
+  isolation: isolate;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
 
-.cell {
+/* js/anim.js sets --cell and places the empty slots and the tiles. */
+.slot, .tile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 8px;
+}
+
+.slot { background: #E9D3B1; }
+
+.tile {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  background: #E9D3B1;
   font-weight: bold;
   font-size: calc(var(--board) * 0.1);
+  will-change: transform;
+  z-index: 3;
 }
 
-.cell.new { animation: appear 0.15s ease-out; }
-
-@keyframes appear {
-  from { transform: scale(0.4); }
-  to { transform: scale(1); }
-}
+/* A new tile grows in under tiles sliding past. A tile merging into
+   another slides in under it, and its number fades so the two read as one. */
+.tile.new { z-index: 2; }
+.tile.merging { z-index: 1; color: transparent; transition: color 0.1s; }
 
 /* Light cream for small tiles, deepening to orange and red as they grow. */
 .t1 { background: #FFF6DF; }
